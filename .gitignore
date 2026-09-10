@@ -1,0 +1,19 @@
+# Java
+backend/target/
+*.class
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Local configuration
+.env
+*.local
+
+# IDE
+.idea/
+.vscode/settings.json
+
+# Test artifacts
+coverage/
+reports/

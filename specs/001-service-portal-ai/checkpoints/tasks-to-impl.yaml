@@ -1,0 +1,102 @@
+batch: request-lifecycle-tracking
+feature: 001-service-portal-ai
+status: completed_with_warning
+completed_task_ids:
+  - T002
+  - T003
+  - T006
+  - T018
+  - T022
+  - T033
+  - T035
+  - T036
+  - T010
+  - T023
+  - T029
+  - T032
+  - T030
+  - T031
+  - T007
+  - T011
+  - T013
+  - T014
+  - T008
+  - T019
+  - T020
+  - T021
+  - T025
+requirements:
+  - FR-001
+  - FR-002
+  - FR-003
+  - FR-004
+  - FR-025
+  - FR-026
+  - FR-027
+  - FR-028
+  - FR-017
+  - FR-018
+  - FR-019
+  - FR-020
+  - FR-021
+  - FR-005
+  - FR-006
+  - FR-007
+  - FR-009
+  - FR-010
+  - FR-012
+  - FR-023
+  - FR-004
+  - FR-014
+  - FR-015
+  - FR-005
+  - FR-006
+  - FR-007
+  - FR-008
+  - FR-012
+  - FR-027
+  - FR-028
+acceptance_coverage:
+  - registration creates a customer account without exposing a password
+  - valid credentials return access and refresh tokens
+  - invalid credentials return a generic 401 response
+  - protected current-user access requires a valid JWT
+  - logout revokes the refresh session
+  - audit records are persisted for authentication events
+  - customers can create, read, update, list, and comment on owned requests
+  - customers cannot read another customer's request
+  - local administrator can log in and view protected overview metrics
+  - customer access to administrator overview returns 403
+  - administrator can list all requests with associated customer owner
+  - administrator can update request status and priority
+  - authenticated students receive a persisted chat session ID and assistant replies are appended to chat history
+  - chat intent detection suggests a campus category and priority, supports confirmation-gated request creation, and returns owned ticket status
+  - student chat quick actions populate the embedded assistant input
+verification:
+  backend_tests: pass
+  lifecycle_contract_tests: pass
+  frontend_tests: pass
+  frontend_build: pass
+  runtime_health_probe: pass
+  runtime_openapi_probe: pass
+  focused_correlation_openapi_tests: not_run_environment_skipped
+  runtime_auth_probe: pass
+  postgresql_probe: unavailable_docker_not_installed
+pending_dependencies:
+  - T005
+  - T009
+  - T017
+  - T019
+  - T020
+  - T021
+  - T023
+  - T024
+  - T009
+  - T008
+  - T010
+  - T012
+warnings:
+  - severity: LOW
+    message: Existing frontend JSX is formatted as a single long line; persisted event timeline and live SSE updates are implemented without broad reformatting.
+  - severity: LOW
+    message: Focused correlation/OpenAPI smoke test execution was skipped by the environment after implementation; the prior backend suite and compilation passed.

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: campus-services-hub-api
+  profiles:
+    active: local
+  jpa:
+    open-in-view: false
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  pattern:
+    level: "%5p [corr:%X{correlationId:-}]"

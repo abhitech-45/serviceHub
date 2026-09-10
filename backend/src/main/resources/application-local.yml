@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/servicehub}
+    username: postgres
+    password: abhi
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${OPENAI_MODEL:gpt-4o-mini}
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration
+
+servicehub:
+  local-admin:
+    email: ${ADMIN_EMAIL:admin@servicehub.local}
+    password: ${ADMIN_PASSWORD:Admin@12345}
+    display-name: ${ADMIN_DISPLAY_NAME:Campus Services Administrator}
+  security:
+    jwt-secret: ${JWT_SECRET:local-development-secret-change-me-please-1234567890}
+    access-token-minutes: 15

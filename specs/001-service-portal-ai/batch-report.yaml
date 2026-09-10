@@ -1,0 +1,205 @@
+batch: request-lifecycle-tracking
+status: completed_with_warning
+artifact_path: specs/001-service-portal-ai
+completed_tasks:
+  - assignment-only-support-agent-directory
+  - restore-admin-request-management-ui
+  - remove-static-faq-implementation
+  - restore-footer-faq-and-category-subject
+  - campus-service-quick-access-cards
+  - remove-shared-support-login
+  - ask-student-support-faq
+  - campus-homepage-hero
+  - student-portal-visual-redesign
+  - admin-save-only-request-updates
+  - admin-request-actions-table
+  - student-ai-chatbot
+  - student-dashboard-admin-sync
+  - student-dashboard-request-metrics
+  - logout-credential-reset
+  - admin-category-filter
+  - student-request-update-flow-fix
+  - category-change-form-reset
+  - student-dashboard-request-form-popup
+  - ai-powered-chat-integration
+  - campus-category-subcategory-taxonomy
+  - student-campus-services-rebrand
+  - admin-update-success-notification
+  - T019
+  - T020
+  - T021
+  - T025
+  - T008
+  - T001
+  - T002
+  - T003
+  - T006
+  - T007
+  - T011
+  - T013
+  - T014
+  - T018
+  - T022
+required_endpoints:
+  - method: POST
+    path: /api/v1/chat/messages
+    source: student-ai-chatbot
+    status: implemented
+    runtime_status: contract-tested
+  - method: POST
+    path: /api/v1/auth/register
+    source: contracts/auth-and-health.md
+    status: implemented
+    runtime_status: 201
+  - method: POST
+    path: /api/v1/auth/login
+    source: contracts/auth-and-health.md
+    status: implemented
+    runtime_status: 200
+  - method: POST
+    path: /api/v1/auth/logout
+    source: contracts/auth-and-health.md
+    status: implemented
+    runtime_status: 204
+  - method: GET
+    path: /api/v1/users/me
+    source: contracts/auth-and-health.md
+    status: implemented
+    runtime_status: 200
+  - method: POST
+    path: /api/v1/requests
+    source: contracts/auth-and-health.md
+    status: implemented
+    runtime_status: 201
+  - method: GET
+    path: /api/v1/requests/{reference}
+    source: specs/001-service-portal-ai/tasks.md
+    status: implemented
+    runtime_status: 200
+  - method: PATCH
+    path: /api/v1/requests/{reference}
+    source: specs/001-service-portal-ai/tasks.md
+    status: implemented
+    runtime_status: 200
+  - method: POST
+    path: /api/v1/requests/{reference}/comments
+    source: specs/001-service-portal-ai/tasks.md
+    status: implemented
+    runtime_status: 200
+  - method: PATCH
+    path: /api/v1/admin/requests/{reference}
+    source: request-lifecycle-tracking
+    status: implemented
+    runtime_status: contract-tested
+  - method: GET
+    path: /api/v1/requests/{reference}/events
+    source: request-lifecycle-tracking
+    status: implemented
+    runtime_status: protected-route
+  - method: GET
+    path: /api/v1/admin/support-agents
+    source: support-agent-directory
+    status: implemented
+    runtime_status: contract-tested
+validation:
+  support_agent_directory_seed_backend: pass
+  restored_admin_ui_frontend: pass
+  restored_admin_ui_backend_contract: pass
+  static_faq_removal_frontend: pass
+  footer_faq_and_category_subject_frontend: pass
+  campus_service_quick_access_frontend: pass
+  support-login-removal_backend: pass
+  support-login-removal_frontend: pass
+  ask_student_support_faq_frontend: pass
+  campus_homepage_hero_frontend: pass
+  student_ui_redesign_frontend: pass
+  admin_save_only_backend_tests: pass
+  admin_save_only_frontend_build: pass
+  chatbot_contract_tests: pass
+  student_dashboard_admin_sync_frontend: pass
+  student_dashboard_metrics_frontend: pass
+  logout_credential_reset_frontend: pass
+  admin_category_filter_frontend: pass
+  request_update_api_contract: pass
+  request_update_frontend_build: pass
+  campus_taxonomy_contract: pass
+  backend_tests: pass
+  frontend_tests: pass
+  frontend_build: pass
+  runtime_health_probe: pass
+  runtime_openapi_probe: pass
+  focused_correlation_openapi_tests: not_run_environment_skipped
+  auth_contract_tests: pass
+  request_contract_tests: pass
+  browser_render: pass
+  browser_auth_and_request_flow: pass
+  browser_mobile_smoke: pass
+  admin_backend_contract: pass
+  admin_browser_flow: pass
+  admin_request_list_and_action: pass
+  live_auth_probe: pass
+  workspace_diagnostics: pass
+  admin_success_notification: pass
+  category_change_form_reset_frontend: pass
+  student_dashboard_request_form_popup_frontend: pass
+  ai_chat_session_persistence_backend: pass
+  ai_chat_session_context_frontend: pass
+  ai_chat_quick_actions_frontend: pass
+  openai_secret_removed_local_config: pass
+  chatbot_visible_student_dashboard: pass
+  chatbot_visible_admin_dashboard: pass
+  chatbot_quick_actions_submit_messages: pass
+  chatbot_admin_dashboard_removed: pass
+warnings:
+  - severity: MEDIUM
+    message: Default local profile disables Spring AI OpenAI auto-configuration to prevent startup failure without credentials; chatbot uses deterministic fallback. Enable OpenAI through a separate keyed profile after rotating the exposed key.
+  - severity: HIGH
+    message: The OpenAI API key supplied in the request was not stored or used. Revoke/rotate it in OpenAI immediately and provide the replacement only through OPENAI_API_KEY at runtime.
+  - severity: LOW
+    message: Existing frontend JSX is formatted as a single long line; the persisted event timeline is implemented and verified, while future pending-stage rendering was left out to avoid an unrelated broad reformat.
+  - severity: LOW
+    message: The focused correlation/OpenAPI smoke test command was skipped by the environment after the test additions; rerun mvn -Dtest=ServiceHubApplicationTests test from backend to verify those two assertions.
+  - severity: MEDIUM
+    message: Docker is unavailable in the environment, so the PostgreSQL local profile was not probed. Live endpoint verification used the H2 test profile; production/local configuration remains PostgreSQL-backed.
+  - severity: MEDIUM
+    message: Docker is intentionally deferred; PostgreSQL/Flyway runtime migration verification remains pending.
+  - severity: LOW
+    message: T012, T017, and T024 remain pending; lifecycle contract coverage was added to the existing request/admin contract suites.
+notes:
+  - Local startup now seeds five directory-only SUPPORT_AGENT records for the admin assignment dropdown without creating shared login credentials.
+  - Restored the administrator request queue, category filter, draft status/priority/assignment controls, remarks, resolution fields, and Save update action that had been commented out in the frontend.
+  - Removed the static FAQ catalog, FAQ search/accordion state, FAQ view, FAQ card, and related documentation; the separate AI chatbot and Quick Access service cards remain.
+  - Added responsive quick-access cards for Academic Support, Admission Assistance, Scholarships, Library, Hostel, Gym & Sports, Examination, Technical Support, Career Guidance, Transport, Finance, and Administration.
+  - Removed the shared support@servicehub.local / Support@12345 login seed, test fixture, local configuration, and README references while retaining generic support-agent assignment infrastructure.
+  - Added a responsive homepage hero banner featuring a campus/student study visual with accessible contrast overlay and academic-support messaging.
+  - Redesigned the portal visual system for university students with blue, teal, violet, rounded cards, soft shadows, welcoming typography, and responsive mobile layouts.
+  - Admin status, priority, assignment, remarks, and resolution edits are staged locally and persisted only when Save update is clicked.
+  - Each committed admin update is appended to the dedicated admin_request_actions table; service_requests remains the current-state source of truth.
+  - Added optional Spring AI OpenAI integration with deterministic FAQ/troubleshooting fallback when no provider is configured or the provider fails.
+  - Chat ticket creation requires an explicit `confirm create:` message and status lookup is restricted to the authenticated student's owned requests.
+  - Student dashboard request counts now refresh every five seconds, so admin status changes are reflected in total, open, pending, resolved, and recently updated metrics without requiring a page reload.
+  - Student dashboard now shows total, open, pending, resolved, and recently updated request counts scoped to the authenticated student.
+  - Admin and student logout now clear email, password, registration name, auth mode, and transient auth/workspace messages before returning to login.
+  - Administrator dashboard now filters the authorized request queue by the selected campus service category and shows a matching-case count.
+  - Student request editing now loads and submits the persisted sub-category, clears stale errors before saving, and updates the selected request from the successful API response.
+  - Student request creation and editing now persist a validated category and sub-category from the campus services catalog.
+  - Rebranded the visible product and API metadata from generic service operations to Student Support & Campus Services while preserving existing API/database namespaces.
+  - Admin Save Update now shows a transient "Request updated successfully" notification after a successful backend response.
+  - Student Quick Access category changes now reset subject, description, and priority instead of carrying values from the previous request form.
+  - Student category cards now control request-form visibility, selected-card highlighting, fresh form initialization, and a short reveal animation.
+  - Added authenticated ChatSession and ChatMessage persistence, session-aware assistant replies, intent/category/priority metadata, open-ticket lookup, and student chat quick actions.
+  - OpenAI credentials are now supplied only through OPENAI_API_KEY; no key is stored in application-local.yml.
+  - Confirmed chat-created requests now retain the detected campus category, valid subcategory, description, and suggested priority.
+  - Fixed the chatbot visibility regression caused by legacy display:none rules; quick actions now submit immediately, and administrators receive the same working assistant widget.
+  - Removed the chatbot and quick-action controls from the administrator dashboard; the assistant remains available only in the student dashboard footer.
+  - Admin assignment now uses the active SUPPORT_AGENT directory and rejects arbitrary non-agent users.
+  - Optional admin remarks and resolution values are normalized so blank form fields do not cause update failures.
+  - Local profile seeds only the administrator; support-agent credentials are no longer hard-coded or shared.
+  - Spring Boot upgraded from 3.5.5 to supported patch 3.5.16.
+  - Passwords and raw credentials are not returned by API responses.
+  - Frontend API client, session persistence, request workspace, responsive styling, and backend CORS preflight support are implemented.
+  - Local admin login: admin@servicehub.local / Admin@12345. Override with ADMIN_EMAIL and ADMIN_PASSWORD for local development.
+  - Local PostgreSQL schema mode is update, preventing application restarts from recreating stored data.
+  - Admin request oversight exposes owner, category, priority, status, and timestamps; high and critical rows are visually emphasized and status/priority actions are audited.
+  - Root cause of missing durable writes was a port/profile mismatch: the frontend targeted stale H2 test backend port 8080 while the current local PostgreSQL backend runs on port 8081.
+  - Verified PostgreSQL 16 connection and read-after-write persistence on port 8081; frontend browser flow passed against the same backend.
