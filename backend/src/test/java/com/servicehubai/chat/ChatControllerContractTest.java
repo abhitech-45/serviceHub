@@ -50,6 +50,40 @@ class ChatControllerContractTest {
                 .andExpect(jsonPath("$.createdRequest").doesNotExist());
     }
 
+            @Test
+            void returnsNoOpenCasesMessageForTrackTicket() throws Exception {
+            String token = registerAndLogin("chat-track-empty-" + System.nanoTime() + "@example.com");
+
+            mockMvc.perform(post("/api/v1/chat/messages")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"message\":\"Track Ticket\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.intent").value("CHECK_TICKET_STATUS"))
+                .andExpect(jsonPath("$.answer").value("You have no open support cases."));
+            }
+
+            @Test
+            void confirmsAndCreatesAcademicCase() throws Exception {
+            String token = registerAndLogin("chat-create-confirm-" + System.nanoTime() + "@example.com");
+
+            String pending = mockMvc.perform(post("/api/v1/chat/messages")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"message\":\"Please create a support request for my academic attendance issue\"}"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+            String sessionId = JsonPath.read(pending, "$.sessionId");
+
+            mockMvc.perform(post("/api/v1/chat/messages")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"sessionId\":\"" + sessionId + "\",\"message\":\"yes\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.createdRequest.reference").isNotEmpty())
+                .andExpect(jsonPath("$.createdRequest.category").value("Academic Support"));
+            }
+
     private String registerAndLogin(String email) throws Exception {
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

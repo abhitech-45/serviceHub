@@ -150,6 +150,9 @@ validation:
   chatbot_visible_admin_dashboard: pass
   chatbot_quick_actions_submit_messages: pass
   chatbot_admin_dashboard_removed: pass
+  chatbot_active_ticket_details: pass
+  chatbot_confirmation_creation: pass
+  chatbot_academic_placement_guidance: pass
 warnings:
   - severity: MEDIUM
     message: Default local profile disables Spring AI OpenAI auto-configuration to prevent startup failure without credentials; chatbot uses deterministic fallback. Enable OpenAI through a separate keyed profile after rotating the exposed key.
@@ -192,6 +195,8 @@ notes:
   - Confirmed chat-created requests now retain the detected campus category, valid subcategory, description, and suggested priority.
   - Fixed the chatbot visibility regression caused by legacy display:none rules; quick actions now submit immediately, and administrators receive the same working assistant widget.
   - Removed the chatbot and quick-action controls from the administrator dashboard; the assistant remains available only in the student dashboard footer.
+  - Track Ticket now returns complete authenticated-student ticket details, and confirmed chat creation is covered for category-aware requests.
+  - Added useful Academic Support and Placement Cell fallback guidance instead of the generic assistant response.
   - Admin assignment now uses the active SUPPORT_AGENT directory and rejects arbitrary non-agent users.
   - Optional admin remarks and resolution values are normalized so blank form fields do not cause update failures.
   - Local profile seeds only the administrator; support-agent credentials are no longer hard-coded or shared.

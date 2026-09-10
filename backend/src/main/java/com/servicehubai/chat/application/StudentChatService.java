@@ -1,6 +1,8 @@
 package com.servicehubai.chat.application;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +31,8 @@ import com.servicehubai.user.infrastructure.UserRepository;
 public class StudentChatService {
 
     private static final String CONFIRM_PREFIX = "confirm create:";
+    private static final DateTimeFormatter CHAT_DATE = DateTimeFormatter.ofPattern("dd MMM yyyy")
+            .withZone(ZoneId.systemDefault());
     private final RequestService requestService;
     private final ObjectProvider<ChatClient> chatClient;
     private final ChatSessionRepository sessionRepository;
@@ -53,8 +57,10 @@ public class StudentChatService {
         String normalized = message.toLowerCase(Locale.ROOT);
         messageRepository.save(new ChatMessageEntity(session, "STUDENT", message));
 
-        if (normalized.startsWith(CONFIRM_PREFIX)) {
-            String details = message.substring(CONFIRM_PREFIX.length()).trim();
+        if (normalized.startsWith(CONFIRM_PREFIX) || normalized.matches("^(yes|confirm|confirmed|create it|please create it)(:)?( .*)?$")) {
+            String details = normalized.startsWith(CONFIRM_PREFIX)
+                    ? message.substring(CONFIRM_PREFIX.length()).trim()
+                    : message.replaceFirst("(?i)^(yes|confirm|confirmed|create it|please create it)(:)?\\s*", "").trim();
             PendingCreate pending = pendingCreates.remove(session.getId());
             if (pending == null) {
                 return finish(session, "GENERAL_ASSISTANCE", null, RequestPriority.MEDIUM,
@@ -77,11 +83,11 @@ public class StudentChatService {
                         .filter(request -> request.status() != com.servicehubai.request.domain.RequestStatus.CLOSED)
                         .toList();
                 return finish(session, intent, category, priority,
-                        matching.isEmpty() ? "You have no open support cases." : "Here are your open support cases.",
+                    matching.isEmpty() ? "You have no open support cases." : formatOpenRequests(matching),
                         false, null, matching);
             }
             Response request = requestService.get(email, reference);
-            return finish(session, intent, category, priority, "Case " + reference + " is currently " + request.status() + ".",
+                return finish(session, intent, category, priority, formatOpenRequests(List.of(request)),
                     false, request, List.of());
         }
         if ("CREATE_SERVICE_REQUEST".equals(intent)) {
@@ -112,7 +118,7 @@ public class StudentChatService {
 
     private String intent(String message) {
         if (message.matches(".*(create|raise|submit|register|log).*(ticket|request|case|complaint).*")) return "CREATE_SERVICE_REQUEST";
-        if (message.matches(".*(sr-[a-z0-9-]+|ticket status|case status|open requests|active complaints).*")) return "CHECK_TICKET_STATUS";
+            if (message.matches(".*(sr-[a-z0-9-]+|ticket status|case status|track ticket|track my ticket|my requests|show my requests|open requests|active complaints|active requests).*")) return "CHECK_TICKET_STATUS";
         if (message.matches(".*(not working|cannot|can't|unable|error|issue|problem|incorrect).*")) return "TROUBLESHOOTING";
         if (message.matches(".*(how|when|where|what|documents|timing|apply|download).*")) return "FAQ_QUERY";
         return "GENERAL_ASSISTANCE";
@@ -177,7 +183,29 @@ public class StudentChatService {
         if (message.contains("hall ticket") || message.contains("exam")) return "For hall-ticket and exam schedule questions, check the Examination Cell announcements first. I can help you raise an Examination Cell case.";
         if (message.contains("hostel") || message.contains("wifi")) return "Try reconnecting to the campus network and restarting your device. If the problem persists, submit a Hostel Services or IT Helpdesk case with your building and room number.";
         if (message.contains("login") || message.contains("password")) return "Verify your student username, reset your password, clear browser cache, and try again. If it still fails, I can help you create an IT Helpdesk case.";
+        if (message.contains("academic") || message.contains("attendance") || message.contains("marks") || message.contains("subject")) return "For academic support, I can help with course registration, subject changes, attendance questions, marks verification, exam queries, and academic certificates. Include your course and semester when you create a case.";
+        if (message.contains("placement") || message.contains("resume") || message.contains("interview")) return "For Placement Cell support, I can help with placement registration, interview schedules, resume guidance, and company applications. Include the company or placement drive name for faster support.";
         return "I can answer campus-service questions, guide troubleshooting, check an owned ticket, or help create a support case. What do you need help with?";
+    }
+
+    private String formatOpenRequests(List<Response> requests) {
+        StringBuilder answer = new StringBuilder("Here are your active support cases:\n");
+        for (int index = 0; index < requests.size(); index++) {
+            Response request = requests.get(index);
+            String latestRemark = request.history().stream()
+                    .map(com.servicehubai.request.api.RequestDtos.HistoryResponse::remarks)
+                    .filter(remark -> remark != null && !remark.isBlank())
+                    .reduce((first, second) -> second)
+                    .orElse("No timeline update yet.");
+            answer.append(index + 1).append(". ").append(request.reference()).append("\n")
+                    .append("   Category: ").append(request.category()).append("\n")
+                    .append("   Subject: ").append(request.subject()).append("\n")
+                    .append("   Status: ").append(request.status()).append("\n")
+                    .append("   Created: ").append(CHAT_DATE.format(request.createdAt())).append("\n")
+                    .append("   Latest update: ").append(latestRemark);
+            if (index < requests.size() - 1) answer.append("\n\n");
+        }
+        return answer.toString();
     }
 
     private Reply finish(ChatSessionEntity session, String intent, String category, RequestPriority priority,
