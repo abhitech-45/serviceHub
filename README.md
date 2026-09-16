@@ -2,7 +2,7 @@
 
 Campus Services Hub is a student-facing university support portal. Students can find campus-service answers, create and track support cases, follow a complete request timeline, and receive help from campus administrators and support specialists.
 
-The project is a local-first modular monolith with a Spring Boot API, React/Vite frontend, PostgreSQL persistence, JWT authentication, real-time request events, and an optional Spring AI/OpenAI integration with a deterministic local fallback.
+The project is a local-first modular monolith with a Spring Boot API, React/Vite frontend, PostgreSQL persistence, JWT authentication, real-time request events, and an optional Claude Haiku integration with a deterministic local fallback.
 
 ## Objectives
 
@@ -70,7 +70,7 @@ Every status update creates a `request_status_history` record. Existing history 
 - Spring Data JPA and Hibernate
 - PostgreSQL for local persistence
 - H2 for automated tests
-- Spring AI 1.0.0 OpenAI starter, disabled in the default local profile unless explicitly enabled
+- Anthropic-compatible Claude Haiku provider with deterministic fallback
 - Springdoc OpenAPI 2.8.13
 - JJWT 0.12.6
 - Maven
@@ -196,21 +196,30 @@ Interactive API documentation is available at `http://localhost:8081/swagger-ui.
 
 ## Chatbot Configuration
 
-The default local profile disables Spring AI provider auto-configuration and uses local FAQ/troubleshooting fallback behavior, so the backend starts without an OpenAI key. Chat sessions and messages are still persisted in `chat_sessions` and `chat_messages`. To enable the Spring AI OpenAI adapter, supply a rotated key at runtime and start with the `openai` profile:
+The local profile supports provider-neutral AI configuration. Chat sessions and messages are persisted in
+`chat_sessions` and `chat_messages`, while ticket actions remain deterministic and confirmation-gated.
+Without provider credentials, the deterministic campus fallback remains available.
 
-For a provider-enabled environment, set these variables through the runtime environment:
-
-```text
-OPENAI_API_KEY=replace-with-a-rotated-openai-key
-OPENAI_MODEL=gpt-4o-mini
+To enable Claude Haiku through an Anthropic-compatible Azure AI endpoint, provide credentials only through
+the runtime environment:
 
 ```powershell
-$env:OPENAI_API_KEY = "<rotated-key>"
-mvn spring-boot:run -Dspring-boot.run.profiles=local,openai
+$env:AI_PROVIDER = "anthropic"
+$env:ANTHROPIC_API_KEY = "<rotated-key>"
+$env:ANTHROPIC_BASE_URL = "https://your-anthropic-endpoint/anthropic"
+$env:ANTHROPIC_MODEL = "claude-haiku-4-5"
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-The assistant recognizes `FAQ_QUERY`, `CREATE_SERVICE_REQUEST`, `CHECK_TICKET_STATUS`, `TROUBLESHOOTING`, and `GENERAL_ASSISTANCE`. Ticket creation requires an explicit `confirm create:` message, and status lookup is restricted to the authenticated student's own requests.
-```
+The default daily AI provider limit is 15 calls and can be changed with `AI_DAILY_LIMIT`. Provider
+responses time out after 10 seconds and fall back to local support behavior. Provider diagnostics are
+available at `GET /api/v1/chat/health`, and `POST /api/v1/chat/test` sends `Hello` to verify connectivity.
+
+The assistant recognizes `FAQ_QUERY`, `CREATE_SERVICE_REQUEST`, `CHECK_TICKET_STATUS`,
+`TROUBLESHOOTING`, `GENERAL_ASSISTANCE`, and guarded escalation requests. Ticket creation requires
+explicit confirmation, status lookup is restricted to the authenticated student's owned requests,
+prompt-injection and secret-disclosure requests are refused, AI usage metrics are exposed in the
+administrator overview, and chat history is retained for 30 days.
 
 Never commit API keys or paste them into README files, source files, or committed `.env` files. The chatbot requires confirmation before creating a service case and only looks up requests owned by the authenticated student.
 

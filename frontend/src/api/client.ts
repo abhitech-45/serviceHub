@@ -35,10 +35,14 @@ export type AdminOverview = {
   totalRequests: number;
   openRequests: number;
   highPriorityRequests: number;
+  totalAiCalls: number;
+  successfulAiCalls: number;
+  timedOutAiCalls: number;
 };
 
 export type SupportAgent = { email: string; displayName: string };
 export type ChatReply = { sessionId: string; intent: string; category: string; suggestedPriority: ServiceRequest['priority']; answer: string; confirmationRequired: boolean; createdRequest: ServiceRequest | null; matchingRequests: ServiceRequest[]; respondedAt: string };
+export type ChatHealth = { provider: string; enabled: boolean; connected: boolean; dailyUsage: number; dailyLimit: number; lastProviderError: string | null; model: string | null; endpoint: string | null };
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8081/api/v1',
@@ -148,6 +152,10 @@ export async function addComment(reference: string, body: string) {
 
 export async function sendChatMessage(message: string, sessionId?: string) {
   return (await api.post<ChatReply>('/chat/messages', { message, sessionId })).data;
+}
+
+export async function chatHealth() {
+  return (await api.get<ChatHealth>('/chat/health')).data;
 }
 
 export function apiErrorMessage(error: unknown) {

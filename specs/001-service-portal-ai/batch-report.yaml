@@ -153,6 +153,15 @@ validation:
   chatbot_active_ticket_details: pass
   chatbot_confirmation_creation: pass
   chatbot_academic_placement_guidance: pass
+  provider_neutral_ai_boundary: pass
+  anthropic_provider_configuration: pass
+  ai_daily_quota: pass
+  ai_usage_metrics: pass
+  ai_prompt_injection_guard: pass
+  chat_retention_job: pass
+  chat_health_endpoint: pass
+  chat_connectivity_test_endpoint: pass
+  openai_configuration_removed: pass
 warnings:
   - severity: MEDIUM
     message: Default local profile disables Spring AI OpenAI auto-configuration to prevent startup failure without credentials; chatbot uses deterministic fallback. Enable OpenAI through a separate keyed profile after rotating the exposed key.
@@ -197,6 +206,9 @@ notes:
   - Removed the chatbot and quick-action controls from the administrator dashboard; the assistant remains available only in the student dashboard footer.
   - Track Ticket now returns complete authenticated-student ticket details, and confirmed chat creation is covered for category-aware requests.
   - Added useful Academic Support and Placement Cell fallback guidance instead of the generic assistant response.
+  - Added provider-neutral AI execution with an Anthropic-compatible Azure endpoint adapter, Spring AI provider switching, ten-second timeout handling, configurable 15-call daily quota, usage metrics, prompt-injection refusal, and 30-day chat retention.
+  - Removed unused OpenAI/GPT dependency and configuration; Claude Haiku is now the only external provider path.
+  - Added authenticated provider health and connectivity-test endpoints with startup validation and meaningful failure reasons.
   - Admin assignment now uses the active SUPPORT_AGENT directory and rejects arbitrary non-agent users.
   - Optional admin remarks and resolution values are normalized so blank form fields do not cause update failures.
   - Local profile seeds only the administrator; support-agent credentials are no longer hard-coded or shared.

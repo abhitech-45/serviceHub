@@ -9,4 +9,5 @@ import com.servicehubai.chat.domain.ChatSessionEntity;
 
 public interface ChatSessionRepository extends JpaRepository<ChatSessionEntity, UUID> {
     Optional<ChatSessionEntity> findByIdAndUserEmailIgnoreCase(UUID id, String email);
+    void deleteByStartedAtBefore(java.time.Instant cutoff);
 }

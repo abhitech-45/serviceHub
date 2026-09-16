@@ -19,6 +19,7 @@ import {
   UserSummary,
   SupportAgent,
   sendChatMessage,
+  chatHealth,
 } from './api/client';
 
 type AuthMode = 'login' | 'register';
@@ -80,6 +81,7 @@ function App() {
   const [chatSessionId, setChatSessionId] = useState('');
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'student' | 'assistant'; text: string; intent?: string }>>([]);
   const [chatBusy, setChatBusy] = useState(false);
+  const [chatHealthState, setChatHealthState] = useState<Awaited<ReturnType<typeof chatHealth>> | null>(null);
 
   useEffect(() => {
     if (!selected || !user || user.roles.includes('ADMINISTRATOR')) return;
@@ -126,11 +128,12 @@ function App() {
 
   useEffect(() => {
     if (!user?.roles.includes('ADMINISTRATOR')) return;
-    Promise.all([adminOverview(), adminRequests(), supportAgents()])
-      .then(([adminSummary, allRequests, agents]) => {
+    Promise.all([adminOverview(), adminRequests(), supportAgents(), chatHealth()])
+      .then(([adminSummary, allRequests, agents, health]) => {
         setOverview(adminSummary);
         setAdminRequestItems(allRequests);
         setSupportAgentItems(agents);
+        setChatHealthState(health);
         setAdminDrafts(Object.fromEntries(allRequests.map((request) => [request.reference, {
           status: request.status,
           priority: request.priority,
@@ -394,7 +397,11 @@ function App() {
           <div><span>Students and staff</span><strong>{overview?.totalUsers ?? '—'}</strong><small>Campus support accounts</small></div>
           <div><span>Support cases</span><strong>{overview?.totalRequests ?? '—'}</strong><small>Across campus services</small></div>
           <div><span>Needs attention</span><strong>{overview?.openRequests ?? '—'}</strong><small>Open support cases</small></div>
+          {/* <div><span>AI conversations</span><strong>{overview?.totalAiCalls ?? '—'}</strong><small>Provider calls recorded</small></div>
+          <div><span>AI responses</span><strong>{overview?.successfulAiCalls ?? '—'}</strong><small>Successful provider calls</small></div>
+          <div><span>AI timeouts</span><strong>{overview?.timedOutAiCalls ?? '—'}</strong><small>Fallback activations</small></div> */}
         </section>
+        {/* <section className="admin-panel ai-diagnostics" aria-label="AI diagnostics"><p className="eyebrow">AI DIAGNOSTICS</p><h2>Campus assistant health</h2><div className="metrics"><div><span>Status</span><strong>{chatHealthState?.enabled ? 'Enabled' : 'Disabled'}</strong><small>{chatHealthState?.connected ? 'Provider connected' : 'Not connected'}</small></div><div><span>Provider</span><strong>{chatHealthState?.provider ?? '—'}</strong><small>{chatHealthState?.model ?? '—'}</small></div><div><span>Daily usage</span><strong>{chatHealthState ? `${chatHealthState.dailyUsage}/${chatHealthState.dailyLimit}` : '—'}</strong><small>{chatHealthState?.lastProviderError ?? 'No provider error recorded'}</small></div></div></section> */}
         <section className="admin-filter" aria-label="Filter campus service requests">
           <label>Show category<select value={adminCategoryFilter} onChange={(event) => setAdminCategoryFilter(event.target.value)}><option value="ALL">All categories</option>{Object.keys(campusCategories).map((category) => <option key={category}>{category}</option>)}</select></label>
           <span>{visibleAdminRequests.length} case{visibleAdminRequests.length === 1 ? '' : 's'} shown</span>

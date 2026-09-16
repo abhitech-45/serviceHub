@@ -1,6 +1,7 @@
 package com.servicehubai.chat;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +35,27 @@ class ChatControllerContractTest {
                 .andExpect(jsonPath("$.intent").value("FAQ_QUERY"))
                 .andExpect(jsonPath("$.answer").isNotEmpty())
                 .andExpect(jsonPath("$.confirmationRequired").value(false));
+    }
+
+    @Test
+    void exposesProviderHealthWhenProviderIsDisabledInTests() throws Exception {
+        String token = registerAndLogin("chat-health-" + System.nanoTime() + "@example.com");
+
+        mockMvc.perform(get("/api/v1/chat/health")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.enabled").value(false))
+                .andExpect(jsonPath("$.dailyLimit").value(15));
+    }
+
+    @Test
+    void exposesDisabledProviderConnectivityTestInTests() throws Exception {
+        String token = registerAndLogin("chat-test-" + System.nanoTime() + "@example.com");
+
+        mockMvc.perform(post("/api/v1/chat/test")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.connected").value(false));
     }
 
     @Test

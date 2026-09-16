@@ -9,4 +9,5 @@ import com.servicehubai.chat.domain.ChatMessageEntity;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, UUID> {
     List<ChatMessageEntity> findBySessionIdOrderByTimestampAsc(UUID sessionId);
+    void deleteByTimestampBefore(java.time.Instant cutoff);
 }

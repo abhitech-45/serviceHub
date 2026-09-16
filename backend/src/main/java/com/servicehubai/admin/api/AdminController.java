@@ -49,7 +49,8 @@ public class AdminController {
         return adminService.updateRequest(authentication.getName(), reference, action);
     }
 
-    public record AdminOverview(long totalUsers, long totalRequests, long openRequests, long highPriorityRequests) {
+    public record AdminOverview(long totalUsers, long totalRequests, long openRequests, long highPriorityRequests,
+            long totalAiCalls, long successfulAiCalls, long timedOutAiCalls) {
     }
 
     public record AdminRequestAction(@NotNull RequestStatus status, @NotNull RequestPriority priority,

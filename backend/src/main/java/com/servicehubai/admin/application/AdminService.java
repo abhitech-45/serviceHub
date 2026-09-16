@@ -19,6 +19,7 @@ import com.servicehubai.user.infrastructure.UserRepository;
 import com.servicehubai.user.domain.Role;
 import com.servicehubai.admin.domain.AdminRequestActionEntity;
 import com.servicehubai.admin.infrastructure.AdminRequestActionRepository;
+import com.servicehubai.chat.infrastructure.AiUsageRepository;
 
 @Service
 public class AdminService {
@@ -30,11 +31,12 @@ public class AdminService {
     private final RequestStatusHistoryRepository historyRepository;
     private final RequestLifecyclePublisher lifecyclePublisher;
     private final AdminRequestActionRepository adminActionRepository;
+    private final AiUsageRepository aiUsageRepository;
 
     public AdminService(UserRepository userRepository, ServiceRequestRepository requestRepository,
             RequestCommentRepository commentRepository, AuditService auditService,
             RequestStatusHistoryRepository historyRepository, RequestLifecyclePublisher lifecyclePublisher,
-            AdminRequestActionRepository adminActionRepository) {
+            AdminRequestActionRepository adminActionRepository, AiUsageRepository aiUsageRepository) {
         this.userRepository = userRepository;
         this.requestRepository = requestRepository;
         this.commentRepository = commentRepository;
@@ -42,6 +44,7 @@ public class AdminService {
         this.historyRepository = historyRepository;
         this.lifecyclePublisher = lifecyclePublisher;
         this.adminActionRepository = adminActionRepository;
+        this.aiUsageRepository = aiUsageRepository;
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +53,8 @@ public class AdminService {
                 userRepository.count(),
                 requestRepository.count(),
                 requestRepository.countByStatusNot(RequestStatus.CLOSED),
-                requestRepository.countByPriorityIn(java.util.List.of(RequestPriority.HIGH, RequestPriority.CRITICAL)));
+                requestRepository.countByPriorityIn(java.util.List.of(RequestPriority.HIGH, RequestPriority.CRITICAL)),
+                aiUsageRepository.count(), aiUsageRepository.countBySuccessfulTrue(), aiUsageRepository.countByTimedOutTrue());
     }
 
         @Transactional(readOnly = true)
