@@ -2,6 +2,8 @@ import { FormEvent, ReactNode } from 'react';
 import { AdminOverview, ServiceRequest, SupportAgent, UserSummary } from '../api/client';
 
 export type AuthMode = 'login' | 'register';
+export type StudentView = 'overview' | 'raise' | 'tickets' | 'support';
+export type AdminView = 'overview' | 'queue';
 export type RequestForm = { subject: string; description: string; category: string; subCategory?: string; priority: ServiceRequest['priority'] };
 export type ChatMessage = { role: 'student' | 'assistant'; text: string; intent?: string };
 export type ChatHealth = { provider: string; enabled: boolean; connected: boolean; dailyUsage: number; dailyLimit: number; lastProviderError: string | null; model: string | null; endpoint: string | null };
@@ -37,6 +39,18 @@ export const quickAccessCards = [
   { category: 'General Administration', title: 'Campus Administration', description: 'ID cards, certificates, and enquiries', accent: 'teal' },
 ];
 
+export const studentNavItems: Array<{ id: StudentView; label: string; icon: string }> = [
+  { id: 'overview', label: 'Overview', icon: 'O' },
+  { id: 'raise', label: 'Raise Ticket', icon: '+' },
+  { id: 'tickets', label: 'My Tickets', icon: '[]' },
+  { id: 'support', label: 'Ask Support', icon: '?' },
+];
+
+export const adminNavItems: Array<{ id: AdminView; label: string; icon: string }> = [
+  { id: 'overview', label: 'Overview', icon: 'O' },
+  { id: 'queue', label: 'Case Queue', icon: '[]' },
+];
+
 export type LoginPageProps = { authMode: AuthMode; authForm: { email: string; password: string; displayName: string }; authError: string; busy: boolean; onSubmit: (event: FormEvent) => void; onChange: (field: 'email' | 'password' | 'displayName', value: string) => void; onToggleMode: () => void };
-export type AdminPageProps = { user: UserSummary; overview: AdminOverview | null; adminSuccess: string; workspaceError: string; categoryFilter: string; requests: ServiceRequest[]; visibleRequests: ServiceRequest[]; supportAgents: SupportAgent[]; busyReference: string; health: ChatHealth | null; onLogout: () => void; onFilter: (value: string) => void; getDraft: (request: ServiceRequest) => { status: ServiceRequest['status']; priority: ServiceRequest['priority']; assigneeEmail: string; remarks: string; resolutionNotes: string }; onDraftChange: (reference: string, field: 'status' | 'priority' | 'assigneeEmail' | 'remarks' | 'resolutionNotes', value: string) => void; onSave: (reference: string) => void };
-export type StudentPageProps = { user: UserSummary; requests: ServiceRequest[]; selected: ServiceRequest | null; form: RequestForm; activeCategory: string | null; workspaceError: string; busy: boolean; comment: string; chatInput: string; chatBusy: boolean; chatMessages: ChatMessage[]; onLogout: () => void; onCategory: (category: string) => void; onRequestSelect: (request: ServiceRequest) => void; onNewRequest: () => void; onFormChange: (field: keyof RequestForm, value: string) => void; onSubmit: (event: FormEvent) => void; onCommentChange: (value: string) => void; onComment: (event: FormEvent) => void; onChatInput: (value: string) => void; onChat: (event: FormEvent) => void; onChatPrompt: (prompt: string) => void; statusLabel: (status: ServiceRequest['status']) => string };
+export type AdminPageProps = { user: UserSummary; overview: AdminOverview | null; adminSuccess: string; workspaceError: string; categoryFilter: string; requests: ServiceRequest[]; visibleRequests: ServiceRequest[]; supportAgents: SupportAgent[]; busyReference: string; health: ChatHealth | null; activeView: AdminView; onLogout: () => void; onFilter: (value: string) => void; onNavigate: (view: AdminView) => void; getDraft: (request: ServiceRequest) => { status: ServiceRequest['status']; priority: ServiceRequest['priority']; assigneeEmail: string; remarks: string; resolutionNotes: string }; onDraftChange: (reference: string, field: 'status' | 'priority' | 'assigneeEmail' | 'remarks' | 'resolutionNotes', value: string) => void; onSave: (reference: string) => void };
+export type StudentPageProps = { user: UserSummary; requests: ServiceRequest[]; selected: ServiceRequest | null; form: RequestForm; activeCategory: string | null; activeView: StudentView; workspaceError: string; busy: boolean; comment: string; chatInput: string; chatBusy: boolean; chatMessages: ChatMessage[]; onLogout: () => void; onCategory: (category: string) => void; onRequestSelect: (request: ServiceRequest) => void; onNewRequest: () => void; onFormChange: (field: keyof RequestForm, value: string) => void; onSubmit: (event: FormEvent) => void; onCommentChange: (value: string) => void; onComment: (event: FormEvent) => void; onChatInput: (value: string) => void; onChat: (event: FormEvent) => void; onChatPrompt: (prompt: string) => void; onNavigate: (view: StudentView) => void; statusLabel: (status: ServiceRequest['status']) => string };

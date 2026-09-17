@@ -25,6 +25,20 @@ textarea { resize: vertical; }
 .auth-panel > .text-button { margin-top: 1.5rem; }
 .form-error { margin: 0; color: #a33e34; font-size: 0.8rem; line-height: 1.5; }
 .app-shell { min-height: 100vh; padding: 1.5rem clamp(1.25rem, 5vw, 5rem) 5rem; background: radial-gradient(circle at 86% 4%, #e5ead9 0, transparent 28%), #f5f2ea; }
+.portal-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; background: #edf4ff; }
+.portal-sidebar { display: flex; flex-direction: column; gap: 1.5rem; padding: 2rem 1.25rem; background: linear-gradient(180deg, #123a63 0%, #0d2847 100%); color: #eef5ff; }
+.brand-block { padding: 0.5rem 0.4rem 1rem; border-bottom: 1px solid rgba(170, 205, 255, .25); }
+.brand-block h2 { margin: 0; font-size: 1.35rem; letter-spacing: -0.04em; }
+.portal-nav { display: grid; gap: 0.45rem; }
+.nav-item { display: flex; align-items: center; gap: 0.8rem; width: 100%; padding: 0.9rem 0.9rem; border: 1px solid transparent; border-radius: 12px; background: transparent; color: rgba(239, 246, 255, .86); text-align: left; }
+.nav-item.active, .nav-item:hover { background: rgba(147, 177, 229, .12); border-color: rgba(147, 177, 229, .28); }
+.nav-icon { width: 1.4rem; font-size: 0.88rem; text-align: center; }
+.sidebar-panel { display: grid; gap: 0.5rem; padding: 1rem; margin-top: auto; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); border-radius: 16px; }
+.sidebar-panel strong { font-size: 1.05rem; }
+.sidebar-panel small { color: rgba(206, 220, 255, .8); }
+.sidebar-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 1rem; border-top: 1px solid rgba(170, 205, 255, .24); color: rgba(239, 246, 255, .9); }
+.sidebar-footer .text-button { color: #dfeaff; }
+.portal-main { padding-top: 1.5rem; }
 .topbar { display: flex; justify-content: space-between; align-items: center; max-width: 1320px; margin: auto; padding: 0.7rem 0 1.5rem; border-bottom: 1px solid #deded5; }
 .topbar strong { font-size: 0.93rem; }
 .user-menu { display: flex; align-items: center; gap: 1.4rem; color: #52605a; font-size: 0.8rem; }

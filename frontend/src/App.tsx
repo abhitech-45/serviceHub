@@ -3,7 +3,7 @@ import { addComment, adminRequests, adminUpdateRequest, adminOverview, supportAg
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { StudentDashboardPage } from './pages/StudentDashboardPage';
-import { AuthMode, campusCategories, emptyForm, RequestForm } from './pages/types';
+import { AdminView, AuthMode, campusCategories, emptyForm, RequestForm, StudentView } from './pages/types';
 
 function App() {
   const [user, setUser] = useState<UserSummary | null>(null);
@@ -15,6 +15,8 @@ function App() {
   const [adminBusyReference, setAdminBusyReference] = useState('');
   const [selected, setSelected] = useState<ServiceRequest | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [studentView, setStudentView] = useState<StudentView>('overview');
+  const [adminView, setAdminView] = useState<AdminView>('overview');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authForm, setAuthForm] = useState({ email: '', password: '', displayName: '' });
   const [requestForm, setRequestForm] = useState(emptyForm);
@@ -71,7 +73,7 @@ function App() {
   async function refreshRequests() { try { setWorkspaceError(''); setRequests(await listRequests()); } catch (error) { setWorkspaceError(apiErrorMessage(error)); } }
 
   function clearSession() {
-    localStorage.removeItem('servicehub.accessToken'); localStorage.removeItem('servicehub.refreshToken'); setUser(null); setRequests([]); setSelected(null); setOverview(null); setAdminRequestItems([]); setAuthMode('login'); setAuthForm({ email: '', password: '', displayName: '' }); setAuthError(''); setWorkspaceError(''); setAdminSuccess('');
+    localStorage.removeItem('servicehub.accessToken'); localStorage.removeItem('servicehub.refreshToken'); setUser(null); setRequests([]); setSelected(null); setOverview(null); setAdminRequestItems([]); setStudentView('overview'); setAdminView('overview'); setAuthMode('login'); setAuthForm({ email: '', password: '', displayName: '' }); setAuthError(''); setWorkspaceError(''); setAdminSuccess('');
   }
 
   async function handleAuth(event: FormEvent) {
@@ -113,17 +115,17 @@ function App() {
   function updateAdminDraft(reference: string, field: 'status' | 'priority' | 'assigneeEmail' | 'remarks' | 'resolutionNotes', value: string) { setAdminDrafts((drafts) => ({ ...drafts, [reference]: { ...adminDraft(reference), [field]: value } })); }
   function statusLabel(status: ServiceRequest['status']) { if (status === 'OPEN') return 'Request submitted'; if (status === 'ASSIGNED_TO_SUPPORT') return 'Assigned to support team'; if (status === 'UNDER_REVIEW') return 'Under review'; if (status === 'AWAITING_USER_RESPONSE') return 'Awaiting user response'; if (status === 'USER_RESPONSE_RECEIVED') return 'User response received'; return status.replaceAll('_', ' ').toLowerCase(); }
   function resetRequestFormForCategory(category: string) { setRequestForm({ subject: category, description: '', category, subCategory: campusCategories[category]?.[0], priority: 'MEDIUM' }); }
-  function chooseQuickAccess(category: string) { setSelected(null); setActiveCategory(category); resetRequestFormForCategory(category); window.setTimeout(() => document.querySelector('.form-column')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0); }
+  function chooseQuickAccess(category: string) { setSelected(null); setActiveCategory(category); setStudentView('raise'); resetRequestFormForCategory(category); window.setTimeout(() => document.querySelector('.form-column')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0); }
 
   const visibleAdminRequests = adminCategoryFilter === 'ALL' ? adminRequestItems : adminRequestItems.filter((request) => request.category === adminCategoryFilter);
   const handleAuthField = (field: 'email' | 'password' | 'displayName', value: string) => setAuthForm((current) => ({ ...current, [field]: value }));
   const handleFormField = (field: keyof RequestForm, value: string) => setRequestForm((current) => ({ ...current, [field]: value }));
-  const handleRequestSelect = (request: ServiceRequest) => { setSelected(request); setRequestForm({ subject: request.subject, description: request.description, category: request.category, subCategory: request.subCategory, priority: request.priority }); };
-  const handleNewRequest = () => { setSelected(null); setActiveCategory(null); setRequestForm(emptyForm); };
+  const handleRequestSelect = (request: ServiceRequest) => { setSelected(request); setStudentView('tickets'); setRequestForm({ subject: request.subject, description: request.description, category: request.category, subCategory: request.subCategory, priority: request.priority }); };
+  const handleNewRequest = () => { setSelected(null); setStudentView('raise'); setActiveCategory(null); setRequestForm(emptyForm); };
 
   if (!user) return <LoginPage authMode={authMode} authForm={authForm} authError={authError} busy={busy} onSubmit={handleAuth} onChange={handleAuthField} onToggleMode={() => { setAuthMode(authMode === 'login' ? 'register' : 'login'); setAuthError(''); }} />;
-  if (user.roles.includes('ADMINISTRATOR')) return <AdminDashboardPage user={user} overview={overview} adminSuccess={adminSuccess} workspaceError={workspaceError} categoryFilter={adminCategoryFilter} requests={adminRequestItems} visibleRequests={visibleAdminRequests} supportAgents={supportAgentItems} busyReference={adminBusyReference} health={chatHealthState} onLogout={handleLogout} onFilter={setAdminCategoryFilter} getDraft={(request) => adminDraft(request)} onDraftChange={updateAdminDraft} onSave={handleAdminAction} />;
-  return <StudentDashboardPage user={user} requests={requests} selected={selected} form={requestForm} activeCategory={activeCategory} workspaceError={workspaceError} busy={busy} comment={comment} chatInput={chatInput} chatBusy={chatBusy} chatMessages={chatMessages} onLogout={handleLogout} onCategory={chooseQuickAccess} onRequestSelect={handleRequestSelect} onNewRequest={handleNewRequest} onFormChange={handleFormField} onSubmit={selected ? handleUpdate : handleCreate} onCommentChange={setComment} onComment={handleComment} onChatInput={setChatInput} onChat={handleChat} onChatPrompt={useChatPrompt} statusLabel={statusLabel} />;
+  if (user.roles.includes('ADMINISTRATOR')) return <AdminDashboardPage user={user} overview={overview} adminSuccess={adminSuccess} workspaceError={workspaceError} categoryFilter={adminCategoryFilter} requests={adminRequestItems} visibleRequests={visibleAdminRequests} supportAgents={supportAgentItems} busyReference={adminBusyReference} health={chatHealthState} activeView={adminView} onLogout={handleLogout} onFilter={(value) => { setAdminCategoryFilter(value); setAdminView('queue'); }} onNavigate={setAdminView} getDraft={(request) => adminDraft(request)} onDraftChange={updateAdminDraft} onSave={handleAdminAction} />;
+  return <StudentDashboardPage user={user} requests={requests} selected={selected} form={requestForm} activeCategory={activeCategory} activeView={studentView} workspaceError={workspaceError} busy={busy} comment={comment} chatInput={chatInput} chatBusy={chatBusy} chatMessages={chatMessages} onLogout={handleLogout} onCategory={chooseQuickAccess} onRequestSelect={handleRequestSelect} onNewRequest={handleNewRequest} onFormChange={handleFormField} onSubmit={selected ? handleUpdate : handleCreate} onCommentChange={setComment} onComment={handleComment} onChatInput={setChatInput} onChat={handleChat} onChatPrompt={(prompt) => { setStudentView('support'); void useChatPrompt(prompt); }} onNavigate={setStudentView} statusLabel={statusLabel} />;
 }
 
 export default App;
