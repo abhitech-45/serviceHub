@@ -162,6 +162,7 @@ validation:
   chat_health_endpoint: pass
   chat_connectivity_test_endpoint: pass
   openai_configuration_removed: pass
+  frontend_page_extraction: pass
 warnings:
   - severity: MEDIUM
     message: Default local profile disables Spring AI OpenAI auto-configuration to prevent startup failure without credentials; chatbot uses deterministic fallback. Enable OpenAI through a separate keyed profile after rotating the exposed key.
@@ -209,6 +210,7 @@ notes:
   - Added provider-neutral AI execution with an Anthropic-compatible Azure endpoint adapter, Spring AI provider switching, ten-second timeout handling, configurable 15-call daily quota, usage metrics, prompt-injection refusal, and 30-day chat retention.
   - Removed unused OpenAI/GPT dependency and configuration; Claude Haiku is now the only external provider path.
   - Added authenticated provider health and connectivity-test endpoints with startup validation and meaningful failure reasons.
+  - Extracted login, student dashboard, and administrator dashboard UI from App.tsx into typed page components without changing the existing API, authentication, request, admin-save, or chat workflows.
   - Admin assignment now uses the active SUPPORT_AGENT directory and rejects arbitrary non-agent users.
   - Optional admin remarks and resolution values are normalized so blank form fields do not cause update failures.
   - Local profile seeds only the administrator; support-agent credentials are no longer hard-coded or shared.

@@ -106,6 +106,7 @@ serviceHubAI/
 │   ├── package.json
 │   └── src/
 │       ├── App.tsx         # Student/admin portal views and interactions
+│       ├── pages/           # Login, student dashboard, admin dashboard, and shared page types
 │       ├── api/client.ts    # Typed API client and SSE subscription
 │       └── styles.css       # Responsive university portal visual system
 ├── docker-compose.yml       # Local PostgreSQL
@@ -240,7 +241,7 @@ npm test
 npm run build
 ```
 
-The test suite covers authentication, request ownership, lifecycle history, admin operations, chat intent/confirmation behavior, OpenAPI startup, and application context loading.
+The test suite covers authentication, request ownership, lifecycle history, admin operations, chat intent/confirmation behavior, OpenAPI startup, and application context loading. Page-level UI is separated into `src/pages/LoginPage.tsx`, `src/pages/StudentDashboardPage.tsx`, and `src/pages/AdminDashboardPage.tsx`; `App.tsx` retains session state and workflow orchestration.
 
 ## Configuration Notes
 

@@ -10,6 +10,7 @@ completed_task_ids:
   - T033
   - T035
   - T036
+  - frontend-page-extraction
   - T010
   - T023
   - T029
@@ -72,6 +73,7 @@ acceptance_coverage:
   - authenticated students receive a persisted chat session ID and assistant replies are appended to chat history
   - chat intent detection suggests a campus category and priority, supports confirmation-gated request creation, and returns owned ticket status
   - student chat quick actions populate the embedded assistant input
+  - login, student dashboard, and admin dashboard page modules preserve the existing workflow while App.tsx remains the stateful controller
 verification:
   backend_tests: pass
   lifecycle_contract_tests: pass
