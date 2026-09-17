@@ -123,7 +123,7 @@ public class StudentChatService {
 
     private String providerAnswer(String email, String message, ChatSessionEntity session) {
         AiProvider provider = aiProvider.getIfAvailable();
-        if (provider == null) return null;
+        if (provider == null || !provider.enabled()) return null;
         if (usageRepository.countByOccurredAtGreaterThanEqual(LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant()) >= dailyLimit) return AI_QUOTA_REACHED;
         long started = System.nanoTime();
         try {
@@ -199,6 +199,7 @@ public class StudentChatService {
         if (message.contains("exam") || message.contains("hall ticket") || message.contains("revaluation")) return "Examination Cell";
         if (message.contains("login") || message.contains("password") || message.contains("wifi") || message.contains("portal")) return "IT Helpdesk";
         if (message.contains("attendance") || message.contains("subject") || message.contains("marks") || message.contains("academic")) return "Academic Support";
+        if (message.contains("id card") || message.contains("student id") || message.contains("identity card") || message.contains("lost my card")) return "General Administration";
         return "General Administration";
     }
 
@@ -220,11 +221,15 @@ public class StudentChatService {
             case "Examination Cell" -> "Exam Schedule Queries";
             case "IT Helpdesk" -> "Student Portal Access";
             case "Academic Support" -> "Course Registration";
+            case "General Administration" -> "Student ID Card";
             default -> "General Enquiries";
         };
     }
 
     private String fallback(String message) {
+        if (message.contains("id card") || message.contains("student id") || message.contains("identity card") || message.contains("lost my card")) {
+            return "A lost student ID card is a General Administration request. I can help you create a Student ID Card support case for replacement or emergency access, and I can guide you through the next steps for verification.";
+        }
         if (message.contains("scholarship")) return "For scholarship applications, status, renewal, or payment delays, keep your enrollment and bank documents ready. I can help you create a Scholarship Support case if needed.";
         if (message.contains("library")) return "Library timing and digital-resource access depend on campus schedules. Check the Library Services desk, or create a Library Services case for a specific issue.";
         if (message.contains("hall ticket") || message.contains("exam")) return "For hall-ticket and exam schedule questions, check the Examination Cell announcements first. I can help you raise an Examination Cell case.";

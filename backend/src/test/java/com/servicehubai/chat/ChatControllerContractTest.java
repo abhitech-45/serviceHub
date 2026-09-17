@@ -38,6 +38,20 @@ class ChatControllerContractTest {
     }
 
     @Test
+    void respondsContextuallyWhenStudentIdCardIsLost() throws Exception {
+        String token = registerAndLogin("chat-id-card-" + System.nanoTime() + "@example.com");
+
+        mockMvc.perform(post("/api/v1/chat/messages")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"message\":\"I lost my student ID card\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.intent").value("GENERAL_ASSISTANCE"))
+                .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.containsString("student ID card")))
+                .andExpect(jsonPath("$.answer").value(org.hamcrest.Matchers.containsString("create")));
+    }
+
+    @Test
     void exposesProviderHealthWhenProviderIsDisabledInTests() throws Exception {
         String token = registerAndLogin("chat-health-" + System.nanoTime() + "@example.com");
 

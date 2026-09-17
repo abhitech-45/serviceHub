@@ -4,29 +4,23 @@ spring:
     username: postgres
     password: abhi
   jpa:
-    spring:
-      datasource:
-        url: ${DB_URL:jdbc:postgresql://localhost:5432/servicehub}
-        username: postgres
-        password: abhi
-      jpa:
-        hibernate:
-          ddl-auto: create
-        open-in-view: false
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
 
-    servicehub:
-      ai:
-        provider: ${AI_PROVIDER:anthropic}
-        llm:
-          daily-limit: ${AI_DAILY_LIMIT:15}
-        anthropic:
-          api-key: ${ANTHROPIC_API_KEY:}
-          base-url: ${ANTHROPIC_BASE_URL:https://grad-assessment-2026.services.ai.azure.com/anthropic}
-          model: ${ANTHROPIC_MODEL:claude-haiku-4-5}
-      local-admin:
-        email: ${ADMIN_EMAIL:admin@servicehub.local}
-        password: ${ADMIN_PASSWORD:Admin@12345}
-        display-name: ${ADMIN_DISPLAY_NAME:Campus Services Administrator}
-      security:
-        jwt-secret: ${JWT_SECRET:local-development-secret-change-me-please-1234567890}
-        access-token-minutes: 15
+servicehub:
+  ai:
+    provider: ${AI_PROVIDER:anthropic}
+    llm:
+      daily-limit: ${AI_DAILY_LIMIT:15}
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      base-url: ${ANTHROPIC_BASE_URL:https://grad-assessment-2026.services.ai.azure.com/anthropic}
+      model: ${ANTHROPIC_MODEL:claude-haiku-4-5}
+  local-admin:
+    email: ${ADMIN_EMAIL:admin@servicehub.local}
+    password: ${ADMIN_PASSWORD:Admin@12345}
+    display-name: ${ADMIN_DISPLAY_NAME:Campus Services Administrator}
+  security:
+    jwt-secret: ${JWT_SECRET:local-development-secret-change-me-please-1234567890}
+    access-token-minutes: 15
