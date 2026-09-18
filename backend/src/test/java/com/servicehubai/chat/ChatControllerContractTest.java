@@ -1,11 +1,17 @@
 package com.servicehubai.chat;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.lang.reflect.Method;
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
+
+import com.servicehubai.chat.application.StudentChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +28,21 @@ class ChatControllerContractTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private StudentChatService studentChatService;
+
+    @Test
+    void systemPromptAllowsGeneralKnowledgeWhileKeepingCampusSupport() throws Exception {
+        Method promptMethod = StudentChatService.class.getDeclaredMethod("systemPrompt");
+        promptMethod.setAccessible(true);
+        String prompt = (String) promptMethod.invoke(studentChatService);
+        String lower = prompt.toLowerCase(Locale.ROOT);
+
+        assertTrue(lower.contains("general knowledge"));
+        assertTrue(lower.contains("campus support"));
+        assertTrue(lower.contains("ticket creation") || lower.contains("ticket tracking") || lower.contains("create and track support requests"));
+    }
 
     @Test
     void answersFaqWithDeterministicFallback() throws Exception {
