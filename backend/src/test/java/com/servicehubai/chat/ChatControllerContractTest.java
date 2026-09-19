@@ -41,8 +41,10 @@ class ChatControllerContractTest {
 
         assertTrue(lower.contains("general knowledge"));
         assertTrue(lower.contains("campus support"));
-        assertTrue(lower.contains("ticket creation") || lower.contains("ticket tracking") || lower.contains("create and track support requests"));
-    }
+        assertTrue(
+        lower.contains("track their own tickets")
+        || lower.contains("creating a support request"));   
+     }
 
     @Test
     void answersFaqWithDeterministicFallback() throws Exception {
